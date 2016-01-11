@@ -1,0 +1,101 @@
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+
+<style type="text/css">
+  #note, #value{
+     margin: 5px, 10px;
+     font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+     font-size: 15px;
+     max-width:280px;      
+  }
+  #value{  
+     min-height:50px;
+     overflow:
+  }
+  #err{  
+     color:red;
+  }
+</style>
+
+<div>
+
+  <!--input type="button" value="Poll" id="btn1"
+        class="action  my-btn"/-->
+  
+  <i><b>Value:</b></i>
+  <div id="value"></div>
+  
+  <i><b>Note:</b></i>
+  <div id="note"></div>
+  
+  <div id="err"></div>
+</div>
+
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+</script>
+
+<script>
+
+  $(function() {
+    // Start polling for updates
+   poll();
+    
+  });
+
+
+
+  /**
+   * Poll a server-side function 'serverFunction' at the given interval 
+   * and update DOM elements with results. 
+   *
+   * @param {Number} interval   (optional) Time in ms between polls.
+   *                            Default is 2s (2000ms)
+   */
+  function poll(){
+    setTimeout(function(){
+      google.script.run
+       .withSuccessHandler(
+         function(results) {
+            $('#err').text("");
+            $('#value').html(htmlEscape(results.value));
+            $('#note').html(results.note.replace(/\n/g,"<br/>"));
+            
+           //Setup the next poll recursively
+           poll();
+         })
+       .withFailureHandler(showError)
+       .updateNote();
+    }, 200);
+  };
+   
+  
+  function showError(message, element){
+     //element.disabled = false;
+     $('#err').text("Error: "+ message);
+     poll();
+  }
+  
+  
+  function htmlEscape(str) {
+  if (str == "")
+     return "<font color='blue'><i>{empty}</i></font>";
+  else
+    return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/ /g,    "<font color='blue'><b>&middot;</b></font><wbr/>")
+            .replace(/\r\n/g, "<font color='blue'>\\r\\n </font><br/>")
+            .replace(/\r/g,   "<font color='blue'>\\r   </font><br/>")
+            .replace(/\n/g,   "<font color='blue'>\\n   </font><br/>")
+            .replace(/\t/g,   "<font color='blue'>&raquo;</font>");
+  }
+
+
+</script>
+
+
+
